@@ -42,9 +42,9 @@ Controllers, as other entry points patterns such  Commands or EventSubscribers *
 As far as possible, services should expose only **one main public method**.
 
 E.g.:
-The aim of an `ObjectHandler` is to `handle()`
-The aim of an `ObjectFetcher` is to `fetch()`
-The aim of an `ObjectParser` is to `parse()`
+- The aim of an `ObjectHandler` is to `handle()`
+- The aim of an `ObjectFetcher` is to `fetch()`
+- The aim of an `ObjectParser` is to `parse()`
 
 **Advantages**: maintainability, understanding
 
@@ -242,7 +242,7 @@ E.g.:
 
 ## Private vs protected
 
-**Protected is not private-like**. `private` **first**, `protected` **if needed**. Each visibility has its purpose. `protected` should be used only for attributes/methods reachable in child classes
+**Protected is not private-like**. `private` **first**, `protected` **if needed**. Each visibility has its purpose. `protected` should be used only when attributes/methods are intended to be used/overriden in extended classes
 
 ## Over-testing
 
