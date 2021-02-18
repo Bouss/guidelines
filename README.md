@@ -54,7 +54,8 @@ Services should **not persist any business data**. Recipes depending on setting 
 
 E.g. **bad** pattern:
 
-    public class UserService {
+    public class UserService
+    {
         private User $user
         
         public function handleUser(): void
@@ -70,8 +71,8 @@ E.g. **bad** pattern:
 
 E.g. **good** pattern:
 
-    public class UserService {
-        
+    public class UserService
+    {   
         public function handleUser(User $user): void
         {
             $user->method();
