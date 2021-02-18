@@ -6,7 +6,7 @@
 
 Organize the folders by thinking **technical domain first**.
 
-Eg: Bad organization
+E.g. bad organization:
 
     src/
     ├─ Website1/
@@ -15,7 +15,7 @@ Eg: Bad organization
     └─ Website2/
        ├─ Fetcher.php
        └─ Parser.php
-Eg: Good organization
+E.g. good organization:
 
     src/
     ├─ Fetcher/
@@ -41,7 +41,7 @@ Controllers, as other entry points patterns such  Commands or EventSubscribers *
 
 As far as possible, services should expose only **one main public method**.
 
-Eg: 
+E.g.:
 The aim of an `ObjectHandler` is to `handle()`
 The aim of an `ObjectFetcher` is to `fetch()`
 The aim of an `ObjectParser` is to `parse()`
@@ -85,7 +85,7 @@ E.g. **good** pattern:
 All logic making HTTP **requests to a given API** should be **located in a specific class** (an API client, or API wrapper)
 Each **endpoint call** should be **wrapped into a specific function**.
 
-E.g.
+E.g.:
 
     class GoogleMapsClient
     {
@@ -115,7 +115,7 @@ Abstract classes are sometimes used as interfaces because they assert that the g
 
 But they should not, as abstract methods are designed to achieve **internal contracts** between the Abstract class and its extended classes. Only Interfaces should be used as contracts in an **external context.** BTW, make an Abstract class implement an Interface is absolutely a good practice (and not redundant).
 
-Eg: ~~`public function __construct(AbstractService $service)`~~ ---> `public function __construct(ServiceInterface $service)`
+E.g.: ~~`public function __construct(AbstractService $service)`~~ ---> `public function __construct(ServiceInterface $service)`
 
 **Advantages**: pattern respect
 
@@ -134,7 +134,7 @@ As known as "Helpers". **Low-level functions** handling primary types ( `string`
 
 Pretty often this kind of low-level technical logic is totally **uncorrelated** from the main business logic. Because these classes are totally **decoupled** and don't need any dependency to be used, its methods should be declared `static` so that they can be used everywhere, whenever, without instantiating anything.
 
-Eg: `StringUtils::slugify()`, `LocationUtils::getDistance()`, `NumericUtils::extractFloatFromString()`
+E.g.: `StringUtils::slugify()`, `LocationUtils::getDistance()`, `NumericUtils::extractFloatFromString()`
 	
 **Advantages**: reusability, separation of concerns
 
@@ -160,7 +160,7 @@ Static data should be defined in configuration files (eg : YAML files) or in a e
 
 **No calculated fields in database**. Calculated fields which **entirely depend** on an other field or an other table should not be stored in database. They **look like useful shortcuts** when doing a SQL request... Actually, they're just  a **mental load** and a **bug source** in the application.
 
-Eg: 
+E.g.: 
 
     +-------------------------------------------------+
     |                     comment                     |
@@ -207,7 +207,7 @@ An array can represent mainly two data structures: a collection (of objects or h
 ### Checking for null
 
 When testing that a variable is `null` or not `null`,  **don't test the type of the variable**. Be direct, be explicit.
-Eg: ~~`if (!is_numeric($number))`~~ ---> `if (null !== $number)`
+E.g.: ~~`if (!is_numeric($number))`~~ ---> `if (null !== $number)`
 
 **Advantages**: No mental load. "*Did the developer mean that this variable could have multiple types? Or did he just want to check for `null`/`!null`?*" 
 
@@ -224,7 +224,7 @@ Let the exceptions **bubble up** (raise) as far as possible and catch them at th
 
 If an instruction throw an exception inside a loop structure (eg:  `foreach` or `for`) you probably don't want to **break the execution** at this point, even in a service. It's often a better solution to catch the exception and go to the **next iteration**.
 
-Eg:
+E.g.:
 
     foreach ($data as $item) {
         try {
@@ -267,7 +267,7 @@ It's better to force "not null"  through the PHPDoc:
 
 **Group constants by set** as far as possible. Name the constants like a **namespace**: prefix them with the qualified concept, finish with the value.
 
-Eg: 
+E.g.: 
 
     public const STATUS_PENDING = 'pending';
     public const STATUS_STARTED = 'started';
@@ -280,7 +280,7 @@ Eg:
 If a service contains the qualified concept in its name, **do not repeat** this qualified concept in its methods.
 The service name is self-sufficient. Furthermore, it's "interface-friendly".
 
-Eg : ~~`FileFinder::findFile()`~~ ---> `FileFinder::find()` 
+E.g. : ~~`FileFinder::findFile()`~~ ---> `FileFinder::find()` 
 
 **Advantages**: no redundancy, Interface-oriented
 
