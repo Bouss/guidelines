@@ -249,9 +249,9 @@ E.g.:
 
 ## Nullability and context 
 
-Sometimes a **nullable** variable/function return (declared as it is in the PHPDoc or through the type hinting) is definitively **not null in a given context**. However, IDEs and Continuous Integration tools force us to test if the variable is not null, and do something like throwing an Exception or exiting when it is.
+Sometimes a **nullable** variable/function (declared as it is in the PHPDoc or through the type hinting) is definitively **not null in a given context**. However, IDEs and Continuous Integration tools can not know that and ask us to check for nullability.
 
-Check for null value is not a good solution: this is a useless condition (so useless code lines) because we know we'll **never enter inside**. It looks like **hypocrisy**. Furthermore, it gives a **false information**: "*Really? It could be null here?*" No.
+Adding a test is not a very good solution: this is a useless condition (so useless code lines) because we know we'll **never enter inside** the `if` block. It looks like **hypocrisy**. Furthermore, it gives a **false information**: "*Really? It could be null here?*" No, it could not.
 
 It's better to force "not null"  through the PHPDoc:
 
