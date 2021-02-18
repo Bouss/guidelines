@@ -112,7 +112,7 @@ E.g.:
 
 **Abstract classes are not interfaces**. Both provide a way to define **contracts** in a polymorphism context. However, their scope is different.
 
-Abstract classes are sometimes used as interfaces because they assert that the given polymorphic object implements some needed abstract methods.
+Abstract classes are sometimes used as interfaces because they **assert** that the given polymorphic object **implements** some needed abstract methods.
 
 But they should not, as abstract methods are designed to achieve **internal contracts** between the Abstract class and its extended classes. Only Interfaces should be used as contracts in an **external context.** BTW, make an Abstract class implement an Interface is absolutely a good practice (and not redundant).
 
@@ -123,9 +123,9 @@ E.g.: ~~`public function __construct(AbstractService $service)`~~ ---> `public f
 ## DTO vs DAO
 
 In a Doctrine context, an *Entity* is a DAO:  it represents a **persisted** object **mapped** to a database table.
-Sometimes we handle unpersisted structured data, for temporary needs. We could store them in arrays. However, arrays are **not very structured** and can't **respect any contract**.
+Sometimes we handle unpersisted data, for temporary needs. We could store them in arrays. However, arrays are **not very structured** and can't **respect any contract**.
 
-Work with **objects** is often the best way to achieve it. That's what DTO are designed for: they are very simple objects containing business **structured data** for **temporary needs** (their life cycle is short). They should be ***read-only*** as far as possible, as they just exist to be consumed.
+Working with **objects** is often the best way to achieve it. That's what DTO are designed for: they are very simple objects containing business **structured data** for **temporary needs** (their life cycle is short). They should be ***read-only*** as far as possible, as they just exist to be consumed.
 
 Complex DTOs can be created using a *Factory*.
 
