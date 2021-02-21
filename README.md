@@ -6,7 +6,7 @@
 
 Organize the folders by thinking **technical domain first**.
 
-E.g. bad organization:
+E.g. **bad** organization:
 
     src/
     ├─ Website1/
@@ -15,7 +15,7 @@ E.g. bad organization:
     └─ Website2/
        ├─ Fetcher.php
        └─ Parser.php
-E.g. good organization:
+E.g. **good** organization:
 
     src/
     ├─ Fetcher/
@@ -90,16 +90,20 @@ E.g.:
 
     class GoogleMapsClient
     {
-        private const ENDPOINT_GET_PLACE = '/path/to/place/endpoint';
+        private const ENDPOINT_GET_PLACE = '/path/to/endpoint';
 
-        private $client;	// HTTP client
+        private HttpClientInterface $client;	// Scoped client: configured with Google Maps base URI
         
         public function getPlace(string $placeId): array
         {
             try {
-                $response = $this->client->get(self::ENDPOINT_GET_PLACE . $placeId);
-            } catch (RequestException $e) {
-                throw new GoogleMapsException($e->getMessage);	// Throw a custom exception
+                $response = $this->client->request('GET', self::ENDPOINT_GET_PLACE, [
+		    'query' => [
+		        'place_id' => $placeId
+		    ]
+		]);
+            } catch (TransportExceptionInterface $e) {
+                throw new GoogleMapsException($e->getMessage);	// Throw a custom exception for better error handling
             }
             
             return json_decode($response->getBody()->getContents(), true);
@@ -116,7 +120,9 @@ Abstract classes are sometimes used as interfaces because they **assert** that t
 
 But they should not, as abstract methods are designed to achieve **internal contracts** between the Abstract class and its extended classes. Only Interfaces should be used as contracts in an **external context.** BTW, make an Abstract class implement an Interface is absolutely a good practice (and not redundant).
 
-E.g.: ~~`public function __construct(AbstractService $service)`~~ ---> `public function __construct(ServiceInterface $service)`
+E.g. **bad** signature: `public function __construct(AbstractService $service)`
+
+E.g. **good** signature: `public function __construct(ServiceInterface $service)`
 
 **Advantages**: pattern respect
 
@@ -175,7 +181,8 @@ It would be a mental load to set them if they're used in your application: "*Thi
 
 The solution is **application-related only**, not database-related:  create getters/isers/hasers in the Doctrine entity without defining persisted attributes:
 
-    class Comment {
+    class Comment
+    {
        private ?Reply $reply;
        private ?DateTime $publishedAt;
     
@@ -203,21 +210,22 @@ An array can represent mainly two data structures: a collection (of objects or h
 
 ## Conditions
 
-### Ternary operator
-
 ### Checking for null
 
 When testing that a variable is `null` or not `null`,  **don't test the type of the variable**. Be direct, be explicit.
-E.g.: ~~`if (!is_numeric($number))`~~ ---> `if (null !== $number)`
+
+E.g. **implicit** condition: `if (!is_numeric($number))`
+
+E.g. **explicit** condition: `if (null !== $number)`
 
 **Advantages**: No mental load. "*Did the developer mean that this variable could have multiple types? Or did he just want to check for `null`/`!null`?*" 
 
 
 ## Exceptions
 
- ### Bubble up the exceptions
+### Bubble up the exceptions
 
-Let the exceptions **bubble up** (raise) as far as possible and catch them at the **highest level** (entry points) (eg: Controller, Command, Consumer...) Do not catch them at a low level in order to return `null` , `false`,  `[]` , etc... : the information that **something went wrong** would be **lost**.
+Let the exceptions **bubble up** (raise) as far as possible and catch them at the **highest level** (entry points) (eg: Controller, Command, Consumer...) Do not catch them at a low level in order to return `null` , `false`,  `[]` , etc... : the information that **something went wrong** would be **lost** to early.
 
 **Advantages**: Maintainability: no more wondering: "*Does the function return `null` because it should really return `null` or because an error occurred?*". Flexibility: process separately different kinds of exception in highest levels.
 
@@ -227,11 +235,11 @@ If an instruction throw an exception inside a loop structure (eg:  `foreach` or 
 
 E.g.:
 
-    foreach ($data as $item) {
+    foreach ($data as $datum) {
         try {
-            function($item);
+            function($datum);
         } catch (Exception $e) {
-            // Do something
+            // Do something if necessary, like logging
             
             continue;
         }
@@ -239,28 +247,86 @@ E.g.:
 
 ### Try/catch structure
 
+`try` bloc should contains only instruction(s) which could throw the catched exception(s).
 
+E.g. **bad** try/catch bloc:
+
+    try {
+        functionWichCanThrowAnException();
+	functionFoo();
+	functionBar();
+    } catch (Exception $e) {
+        [...]
+    }
+
+E.g. **good** try/catch bloc:
+
+    try {
+        functionWichCanThrowAnException();
+    } catch (Exception $e) {
+        [...]
+    }
+    
+    functionFoo();
+    functionBar();
+
+**Advantages**: explicit, better understanding
 
 ## Private vs protected
 
-**Protected is not private-like**. `private` **first**, `protected` **if needed**. Each visibility has its purpose. `protected` should be used only when attributes/methods are intended to be used/overriden in extended classes
+**Protected is not private-like**. `private` **first**, `protected` **if needed**. Each visibility has its purpose. `protected` should be used only when attributes/methods are intended to be used/overriden in extended classes. Otherwise, it gives a **false information** to the developer.
 
-## Over-testing
+**Advantages**: pattern respect
 
-## Nullability and context 
+## Nullability, context, and over-testing
 
 Sometimes a **nullable** variable/function (declared as it is in the PHPDoc or through the type hinting) is definitively **not null in a given context**. However, IDEs and Continuous Integration tools can not know that and ask us to check for nullability.
 
 Adding a test is not a very good solution: this is a useless condition (so useless code lines) because we know we'll **never enter inside** the `if` block. It looks like **hypocrisy**. Furthermore, it gives a **false information**: "*Really? It could be null here?*" No, it could not.
 
-It's better to force "not null"  through the PHPDoc:
+It's better to force "not null" through the **PHPDoc**.
+
+E.g. **bad** snippet:
+
+    $var = functionWhichCanNormallyReturnNullButNotIsThisGivenContext();
+
+    if (null === $var) {
+        throw FakeException('Will never happen, but make IDE and CI tools happy');
+    }
+
+E.g. **good** snippet:
 
     /** @var Object $var **/
-    $var = functionWhichCanReturnNullButNotIsThisContextTrustMe();
+    $var = functionWhichCanNormallyReturnNullButNotIsThisGivenContext();
 
-**Advantages**: No useless condition,  so no new complexity
+**Advantages**: No useless condition, less complexity
 
 ## Avoid discontinued threads 
+
+A continued logic, matching a same and unique **purpose**, should **not be dispatched** to different places (different methods/classes).
+
+E.g. **bad** snippet:
+
+    public function method1($obj): void
+    {
+        $this->method2($obj);
+        $this->em->flush();
+    }
+
+    public function method2($obj): void
+    {
+        $this->em->persist($obj);
+    }
+
+E.g. **good** snippet:
+
+    public function method1($obj): void
+    {
+        $this->em->persist($obj);
+	$this->em->flush();
+    }
+    
+**Advantages**: maintainability, decoupling
 
 # Naming conventions
 
@@ -274,14 +340,16 @@ E.g.:
     public const STATUS_STARTED = 'started';
     public const STATUS_FINISHED = 'finished';
 
-**Advantages**: readability, understanding
+**Advantages**: readability, understanding, auto-completion
 
 ## Service's methods
 
 If a service contains the qualified concept in its name, **do not repeat** this qualified concept in its methods.
-The service name is self-sufficient. Furthermore, it's "interface-friendly".
+The service name is self-sufficient. Furthermore, it's **interface-friendly**.
 
-E.g. : ~~`FileFinder::findFile()`~~ ---> `FileFinder::find()` 
+E.g. **bad** signature: `FileFinder::findFile()`
+
+E.g. **good** signature: `FileFinder::find()` 
 
 **Advantages**: no redundancy, Interface-oriented
 
@@ -297,7 +365,7 @@ E.g. : ~~`FileFinder::findFile()`~~ ---> `FileFinder::find()`
 - **Array**:  Suffix collections with a `s` (eg: `$comments` for an array containing `Comment` objects)
 - **DateTime**: Suffix DateTime objects with `At` (eg: `$publishedAt`) (Symfony style)
 - **Boolean**: While the context is convenient, suffix the variables using the simple past tense (eg: `$sent`, `$published`). Don't prefix class attributes with `$is`, do it only for the "isers" (eg: `isSent()`, `isPublished()`)
-- **Counter**: ~~`$numberOfItems`~~ is very verbose. Use `$itemCount` instead
+- **Counter**: `$numberOfItems` is very verbose. Use `$itemCount` instead
 
 # Code style
 
@@ -345,7 +413,7 @@ Like Symfony `render()` method, put the mandatory arguments on **one line** and 
 
 - **return**: New line before final instructions (`return`, `throw`, `continue`, `break`, `exit`) (**Advantages**: PSR, readability)
 - `'` instead of `"`
-- `$array = []` instead of `$array = array()`
+- `$array = []` instead of `$array = array()` (**Advantages**: more elegant, characters saving)
 - Twig `{{ include() }}` function instead of `{% include %}` tag (**Advantages**: more flexibility)
 
 
