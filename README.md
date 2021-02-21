@@ -1,3 +1,4 @@
+
 # Architecture
 
 ## General organization
@@ -98,10 +99,10 @@ E.g.:
         {
             try {
                 $response = $this->client->request('GET', self::ENDPOINT_GET_PLACE, [
-		    'query' => [
-		        'place_id' => $placeId
-		    ]
-		]);
+                    'query' => [
+                        'place_id' => $placeId
+                    ]
+                ]);
             } catch (TransportExceptionInterface $e) {
                 throw new GoogleMapsException($e->getMessage);	// Throw a custom exception for better error handling
             }
@@ -253,8 +254,8 @@ E.g. **bad** try/catch bloc:
 
     try {
         functionWichCanThrowAnException();
-	functionFoo();
-	functionBar();
+        functionFoo();
+        functionBar();
     } catch (Exception $e) {
         [...]
     }
@@ -323,7 +324,7 @@ E.g. **good** snippet:
     public function method1($obj): void
     {
         $this->em->persist($obj);
-	$this->em->flush();
+        $this->em->flush();
     }
     
 **Advantages**: maintainability, decoupling
