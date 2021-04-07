@@ -403,9 +403,9 @@ Finish all conditions with `&&` or `||` operators
 Like Symfony `render()` method, put the mandatory arguments on **one line** and the parameters array on **several lines**:
 
     $object->method($arg1, $arg2, $arg3, [
-       $param1 => XXX,
-       $param2 => XXX,
-       $param3 => XXX
+       'param1' => $param1,
+       'param2' => $param2,
+       'param3' => $param3
     ]);
 
 **Advantages**: Symfony style, readability
