@@ -32,7 +32,7 @@ E.g. **good** organization:
 
 Well, the common rule is *"Thin controllers, fat services"*. However, "fat services" sounds like an **unmaintainable** pattern. Better create a **lot of thin services** with a **very few main functions**.
 
-Controllers, as other entry points patterns such  Commands or EventSubscribers **should not contain any business logic**.  They should only handle **services**.
+Controllers, as other entry points patterns such  Commands or EventSubscribers **should not contain any business logic**. They should only handle **services**.
 
 **Advantages**: maintainability, reusability, separation of concerns
 
@@ -51,7 +51,7 @@ E.g.:
 
 ### Services are stateless
 
-Services should **not persist any business data**. Recipes depending on setting data before handling it is an anti-pattern: what a mental load... Only some **configuration** and **other services** should be injected and set as attributes of a service.
+Services should **not persist any business data**. Recipes depending on setting data before handling it is an anti-pattern: what a cognitive load... Only some **configuration** and **other services** should be injected and set as attributes of a service.
 
 E.g. **bad** pattern:
 
@@ -80,7 +80,7 @@ E.g. **good** pattern:
         }
     }
     
-**Advantages**: stateless, no mental load
+**Advantages**: stateless, no cognitive load
 
 ## API clients
 
@@ -119,7 +119,7 @@ E.g.:
 
 Abstract classes are sometimes used as interfaces because they **assert** that the given polymorphic object **implements** some needed abstract methods.
 
-But they should not, as abstract methods are designed to achieve **internal contracts** between the Abstract class and its extended classes. Only Interfaces should be used as contracts in an **external context.** BTW, make an Abstract class implement an Interface is absolutely a good practice (and not redundant).
+But they should not, as abstract methods are designed to achieve **internal contracts** between the Abstract class and its extended classes. Only Interfaces should be used as contracts in an **external context.**.
 
 E.g. **bad** signature: `public function __construct(AbstractService $service)`
 
@@ -160,13 +160,13 @@ E.g.: `StringUtils::slugify()`, `LocationUtils::getDistance()`, `NumericUtils::e
 
 **No static data in classes.** In order to **separate clearly source code and data**, structured static data should not be stored as constants or static variables in classes or interfaces.
 
-Static data should be defined in configuration files (eg : YAML files) or in a embedded SQLite database. However, it's OK to reference them in a business database, like a foreign key. Because a database should be readable and understandable by a human all the time, using integer IDs for the reference type does not seem a good solution. Better use a string identifier such a **slug**.
+Static data should be defined in configuration files (e.g.: YAML files) or in a embedded SQLite database. However, it's OK to reference them in a business database, like a foreign key. Because a database should be readable and understandable by a human all the time, using integer IDs for the reference type does not seem a good solution. Better use a string identifier such a **slug**.
 
 **Advantages**: Separation of concerns
 
 ## Calculated data
 
-**No calculated fields in database**. Calculated fields which **entirely depend** on an other field or an other table should not be stored in database. They **look like useful shortcuts** when doing a SQL request... Actually, they're just  a **mental load** and a **bug source** in the application.
+**No calculated fields in database**. Calculated fields which **entirely depend** on an other field or an other table should not be stored in database. They **look like useful shortcuts** when doing a SQL request... Actually, they're just  a **cognitive load** and a **bug source** in the application.
 
 E.g.: 
 
@@ -178,7 +178,7 @@ E.g.:
 
 Information `has_reply`  and  `is_published`  can be **calculated** from respectively `reply_id` and `published_at` so they should not exist in the table.
 
-It would be a mental load to set them if they're used in your application: "*This comment has a new reply, I don't have to forget to set `has_reply = 1` (even if `reply_id` is already set). The comment has been published, I don't have to forget to set `published = 1` (even if `published_at` is already set)*"
+It would be a cognitive load to set them if they're used in your application: "*This comment has a new reply, I don't have to forget to set `has_reply = 1` (even if `reply_id` is already set). The comment has been published, I don't have to forget to set `published = 1` (even if `published_at` is already set)*"
 
 The solution is **application-related only**, not database-related:  create getters/isers/hasers in the Doctrine entity without defining persisted attributes:
 
@@ -198,7 +198,7 @@ The solution is **application-related only**, not database-related:  create gett
        }
     }
  
-**Advantages**: No potential bugs, no mental load, lighter database
+**Advantages**: No potential inconsistency, no cognitive load, lighter database
 
 ## Arrays: collection vs hash table
 
@@ -219,14 +219,14 @@ E.g. **implicit** condition: `if (!is_numeric($number))`
 
 E.g. **explicit** condition: `if (null !== $number)`
 
-**Advantages**: No mental load. "*Did the developer mean that this variable could have multiple types? Or did he just want to check for `null`/`!null`?*" 
+**Advantages**: No cognitive load. "*Did the developer mean that this variable could have multiple types? Or did he just want to check for `null`/`!null`?*" 
 
 
 ## Exceptions
 
 ### Bubble up the exceptions
 
-Let the exceptions **bubble up** (raise) as far as possible and catch them at the **highest level** (entry points) (eg: Controller, Command, Consumer...) Do not catch them at a low level in order to return `null` , `false`,  `[]` , etc... : the information that **something went wrong** would be **lost** to early.
+Let the exceptions **bubble up** (raise) as far as possible and catch them at the **highest level** (entry points) (eg: Controller, Command, Consumer...) Do not catch them at a low level in order to return `null` , `false`,  `[]` , etc... : the information that **something went wrong** would be **lost** too early.
 
 **Advantages**: Maintainability: no more wondering: "*Does the function return `null` because it should really return `null` or because an error occurred?*". Flexibility: process separately different kinds of exception in highest levels.
 
